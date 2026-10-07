@@ -8,6 +8,7 @@ This review checks version 1.1.1 (Android version code 3). Automated tests and s
 - Money forms accepted scientific/hexadecimal notation using Number, then some saved it using parseFloat with a different value. Shared validation now accepts decimal money with at most two decimal places.
 - Payment parsing missed spaces after the rupee symbol, accepted malformed comma groups, and could classify negated success messages as expenses. It now accepts valid Indian/Western grouping and rejects malformed amounts and failed/negated messages.
 - Reference parsing could accept a word such as “number” as a transaction identifier. It now recognizes number/no/ID labels, requires a digit and rejects overlong identifiers.
+- A refund using the original transaction reference and amount was discarded as a duplicate payment. Refunds now have separate deduplication IDs; ordinary payment IDs stay compatible with the previous APK.
 - Bill settlements omitted a one-paisa debt and used fractional-paisa math. Splits now distribute integer paisa, including deterministic remainder distribution, and settle every nonzero balance.
 - Confirming an ambiguous UPI payment changed it to Bank and discarded its reference. Review resolution now shares the import logic and preserves source, reference, payment type and date.
 
@@ -34,7 +35,7 @@ This review checks version 1.1.1 (Android version code 3). Automated tests and s
 - Payment import and review regression checks: passed.
 - Money/date/monthly-total regression checks, including Asia/Kolkata midnight: passed.
 - Bill settlement regression checks: passed.
-- Native Kotlin payment parser: 33 cases passed on JVM.
+- Native Kotlin payment parser: 33 cases plus payment/refund fingerprint regressions passed on JVM.
 - Android JavaScript production export: passed.
 - GitHub workflow now runs the native parser as a JUnit unit test and all three TypeScript test files before building the APK. Full updated native build status is recorded in GitHub Actions.
 

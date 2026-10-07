@@ -16,7 +16,7 @@ class MoneyListener : NotificationListenerService() {
     val text="$title $body"
     val parsed=MoneyParser.parse(text) ?: return
     // Ref key omits app source so the same UPI alert from bank + payment app is not counted twice.
-    val fingerprint=parsed.reference?.let { "ref:$it:${parsed.amount}" } ?: "${sbn.packageName}:${sbn.key}:${sbn.postTime/300000}:${text.trim()}"
+    val fingerprint=parsed.fingerprint(sbn.packageName,sbn.key,sbn.postTime,text)
     val id=MessageDigest.getInstance("SHA-256").digest(fingerprint.toByteArray()).joinToString("") { "%02x".format(it) }
     val event=JSONObject().put("id",id).put("amount",parsed.amount).put("kind",parsed.kind).put("source",sbn.packageName).put("timestamp",sbn.postTime).put("reference",parsed.reference ?: JSONObject.NULL)
     if (MoneyStore.enqueue(this,event)) {

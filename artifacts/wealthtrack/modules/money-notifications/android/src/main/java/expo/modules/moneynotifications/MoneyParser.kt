@@ -1,7 +1,7 @@
 package expo.modules.moneynotifications
 
 // Pure parser: no Android dependencies, network, OTPs, or raw notification retention.
-data class MoneyEvent(val amount: Double, val kind: String, val reference: String?)
+data class MoneyEvent(val amount: Double, val kind: String, val reference: String?, val isRefund: Boolean = false)
 object MoneyParser {
   private val money = Regex("(?:₹|INR|Rs\\.?)\\s*([0-9][0-9,]*(?:\\.[0-9]+)?)(?![0-9,]|\\.[0-9])", RegexOption.IGNORE_CASE)
   private val amountFormat = Regex("(?:[0-9]+|[1-9][0-9]{0,2}(?:,[0-9]{3})+|[1-9][0-9]?(?:,[0-9]{2})*,[0-9]{3})(?:\\.[0-9]{1,2})?")
@@ -27,6 +27,11 @@ object MoneyParser {
       debit -> "expense"
       else -> "income"
     }
-    return MoneyEvent(amount, kind, ref)
+    return MoneyEvent(amount, kind, ref, refund)
   }
 }
+
+// Keep ordinary IDs compatible with earlier APKs, but a refund is a separate event.
+fun MoneyEvent.fingerprint(source:String,key:String,postTime:Long,text:String):String =
+  reference?.let { "ref:$it:$amount" + if(isRefund) ":refund" else "" }
+    ?: "$source:$key:${postTime/300000}:${text.trim()}"

@@ -1,4 +1,5 @@
 import expo.modules.moneynotifications.MoneyParser
+import expo.modules.moneynotifications.fingerprint
 fun main() {
   val cases=listOf(
     Triple("₹ 250.50 debited. UPI Ref: 123456789012", "expense", 250.50),
@@ -40,5 +41,13 @@ fun main() {
     if(event!=null) check(event.amount==amount) { "Wrong amount: $event" }
   }
   check(MoneyParser.parse("INR 10 paid. UTR: abc123456")?.reference=="ABC123456")
-  println("${cases.size + 1} native parser cases passed")
+  val paid=checkNotNull(MoneyParser.parse("INR 100 paid. UTR: ABC123456"))
+  val duplicate=checkNotNull(MoneyParser.parse("INR 100 debited. UTR: ABC123456"))
+  val refunded=checkNotNull(MoneyParser.parse("INR 100 refunded. UTR: ABC123456"))
+  val paymentKey=paid.fingerprint("phonepe","1",1000,"payment")
+  check(paymentKey=="ref:ABC123456:100.0") // Stable IDs when updating an existing installation.
+  check(paymentKey==duplicate.fingerprint("bank","2",2000,"duplicate"))
+  check(paymentKey!=refunded.fingerprint("bank","3",3000,"refund"))
+  check(refunded.fingerprint("bank","3",3000,"refund")==refunded.fingerprint("phonepe","4",4000,"duplicate refund"))
+  println("${cases.size + 1} native parser cases and refund/dedup fingerprint regressions passed")
 }
