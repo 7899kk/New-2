@@ -1,3 +1,4 @@
+import { validMoney, validDate, localDate } from "@/utils/financeValidation";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useMemo, useRef, useEffect, useState } from "react";
@@ -86,7 +87,7 @@ export default function DebtsScreen() {
   };
 
   const save = () => {
-    if (!name.trim() || !amount) return;
+    if (!name.trim() || !validMoney(amount) || !validMoney(interest,true,true) || !validDate(dueDate,true)) { Alert.alert("Check debt", "Enter a name, positive amount, non-negative interest and valid date."); return; }
     const data = { name: name.trim(), amount: parseFloat(amount), interest: interest ? parseFloat(interest) : undefined, dueDate: dueDate || undefined, status, type };
     if (editingId) updateDebt(editingId, data);
     else addDebt(data);

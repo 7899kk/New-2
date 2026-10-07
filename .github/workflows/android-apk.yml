@@ -39,6 +39,7 @@ jobs:
         run: |
           pnpm --filter @workspace/wealthtrack typecheck
           node --import ./scripts/node_modules/tsx/dist/loader.mjs artifacts/wealthtrack/tests/capturedPayments.test.ts
+          node --import ./scripts/node_modules/tsx/dist/loader.mjs artifacts/wealthtrack/tests/financeValidation.test.ts
       - name: Generate Android project
         run: pnpm --filter @workspace/wealthtrack exec expo prebuild --platform android --no-install
       - name: Build standalone APK for old and new ARM phones

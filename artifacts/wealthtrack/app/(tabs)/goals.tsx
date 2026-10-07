@@ -1,3 +1,4 @@
+import { validMoney, validDate, localDate } from "@/utils/financeValidation";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
@@ -99,7 +100,7 @@ export default function GoalsScreen() {
   };
 
   const save = () => {
-    if (!name.trim() || !targetAmount) return;
+    if (!name.trim() || !validMoney(targetAmount) || !validMoney(savedAmount,true,true) || !validDate(targetDate,true)) { Alert.alert("Check goal", "Enter a name, positive target, non-negative savings and valid date."); return; }
     const data = {
       name: name.trim(),
       description: description.trim() || undefined,

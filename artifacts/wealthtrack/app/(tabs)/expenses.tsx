@@ -1,3 +1,4 @@
+import { validMoney, validDate, localDate } from "@/utils/financeValidation";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useMemo, useState } from "react";
@@ -109,7 +110,7 @@ export default function ExpensesScreen() {
   };
 
   const save = () => {
-    if (!Number.isFinite(Number(amount)) || Number(amount) <= 0) return;
+    if (!validMoney(amount) || !validDate(date)) { Alert.alert("Check expense", "Enter a positive amount and valid date (YYYY-MM-DD)."); return; }
     const data: Partial<Expense> = {
       date,
       time: time || nowTime(),

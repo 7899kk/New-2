@@ -1,8 +1,10 @@
+import { validMoney, validDate, localDate } from "@/utils/financeValidation";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -83,6 +85,7 @@ export default function OnboardingScreen() {
   };
 
   const finish = () => {
+    if (![monthly,other,savings].every(v=>validMoney(v,true,true)) || ![bikePrice,carPrice,flatPrice].every(v=>validMoney(v,false,true))) { Alert.alert("Check amounts", "Enter valid income/savings and positive goal prices."); return; }
     updateProfile({
       name: name || "Friend",
       username: username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "") || name.toLowerCase().replace(/\s+/g, "_"),
@@ -124,7 +127,7 @@ export default function OnboardingScreen() {
 
   const canProceed = () => {
     if (step === 0) return name.trim().length > 0;
-    if (step === 1) return monthly.length > 0;
+    if (step === 1) return validMoney(monthly,true);
     return true;
   };
 

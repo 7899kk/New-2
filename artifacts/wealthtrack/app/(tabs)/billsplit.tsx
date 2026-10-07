@@ -1,3 +1,4 @@
+import { validMoney, validDate, localDate } from "@/utils/financeValidation";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
@@ -51,10 +52,10 @@ export default function BillSplitScreen() {
 
   const saveGroup = () => {
     if (!groupName.trim() || !membersText.trim()) return;
-    const members = membersText
+    const members = [...new Set(membersText
       .split(",")
       .map((m) => m.trim())
-      .filter((m) => m.length > 0);
+      .filter((m) => m.length > 0))];
     if (members.length < 2) {
       Alert.alert("Error", "Add at least 2 members (comma-separated)");
       return;
@@ -66,14 +67,15 @@ export default function BillSplitScreen() {
   };
 
   const saveExpense = () => {
-    if (!selectedGroup || !expDescription.trim() || !expAmount || !expPaidBy) return;
+    if (!selectedGroup || !expDescription.trim() || !expPaidBy) return;
+    if (!validMoney(expAmount) || !selectedGroup.members.includes(expPaidBy)) { Alert.alert("Check bill", "Enter a positive amount and select a group member who paid."); return; }
     const splitAmong = expSplitAmong.length > 0 ? expSplitAmong : selectedGroup.members;
     addBillExpense(selectedGroup.id, {
       description: expDescription.trim(),
       amount: parseFloat(expAmount),
       paidBy: expPaidBy,
       splitAmong,
-      date: new Date().toISOString().slice(0, 10),
+      date: localDate(),
     });
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setShowExpenseModal(false);

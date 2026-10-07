@@ -1,3 +1,4 @@
+import { monthlyTotals } from "@/utils/financeValidation";
 import { applyCapturedPayments } from "@/utils/capturedPayments";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, {
@@ -455,9 +456,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const month = new Date();
   const currentMonth = `${month.getFullYear()}-${String(month.getMonth()+1).padStart(2,"0")}`;
   // Actual recorded income replaces the planned monthly salary; never add both and double-count salary.
-  const recorded = state.incomes.filter(e=>e.date.startsWith(currentMonth));
-  const totalIncome = recorded.length ? recorded.reduce((sum,e)=>sum+e.amount,0) : state.profile.monthlySalary + state.profile.otherIncome;
-  const totalExpenses = state.expenses.filter(e=>e.date.startsWith(currentMonth)).reduce((s, e) => s + e.amount, 0);
+  const totals=monthlyTotals(currentMonth,state.profile.monthlySalary+state.profile.otherIncome,state.incomes,state.expenses);
+  const totalIncome=totals.income;
+  const totalExpenses=totals.expenses;
   const totalAutoExpenses = state.autoExpenses
     .filter((a) => a.isActive)
     .reduce((s, a) => s + a.amount, 0);

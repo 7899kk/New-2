@@ -1,3 +1,4 @@
+import { validMoney,validDate } from "@/utils/financeValidation";
 import React, { useEffect, useState } from 'react';
 import { Alert, AppState, Modal, Platform, ScrollView, Switch, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -20,8 +21,7 @@ export default function ActivityScreen() {
   const save=()=>{
     if(!editing) return;
     const amount=Number(editing.amount);
-    const parsed=new Date(`${editing.date}T12:00:00`);
-    if(!Number.isFinite(amount)||amount<=0||!/^\d{4}-\d{2}-\d{2}$/.test(editing.date)||!Number.isFinite(parsed.getTime())||parsed.toISOString().slice(0,10)!==editing.date){Alert.alert('Check entry','Enter a positive amount and valid date (YYYY-MM-DD).');return;}
+    if(!validMoney(editing.amount)||!validDate(editing.date)){Alert.alert('Check entry','Enter a positive amount and valid date (YYYY-MM-DD).');return;}
     if(editing.kind==='review'&&editing.id) app.resolvePayment(editing.id,reviewKind==='Income'?'income':'expense',amount,{name:editing.name,category:editing.category,notes:editing.notes});
     else if(editing.kind==='income') {
       const data={amount,date:editing.date,notes:editing.notes,name:editing.name?.trim() || "Money received",category:editing.category || "Uncategorized"};

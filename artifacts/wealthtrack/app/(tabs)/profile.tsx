@@ -1,3 +1,4 @@
+import { validMoney, validDate, localDate } from "@/utils/financeValidation";
 import { Feather } from "@expo/vector-icons";
 import { useAccount } from "@/context/AuthContext";
 import * as Haptics from "expo-haptics";
@@ -41,6 +42,7 @@ function ProfileScreen({ user, signOut }: { user?: any; signOut: () => Promise<v
   const [savings, setSavings] = useState(app.profile.currentSavings.toString());
 
   const save = () => {
+    if (![monthly,other,savings].every(v=>validMoney(v,true,true))) { Alert.alert("Check amounts", "Income and savings must be valid non-negative amounts."); return; }
     app.updateProfile({
       name: name.trim() || app.profile.name,
       username: username.trim().toLowerCase().replace(/\s+/g, "_"),
