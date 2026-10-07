@@ -4,6 +4,8 @@ Expo / React Native app with local finance records, Activity and Android payment
 
 ## Download the Android APK
 
+Latest verified build: [Pro Financer 1.1.1 APK](https://github.com/7899kk/New-2/releases/download/android-6/Pro-Financer.apk). Full native build and regression checks passed; phone tests remain required.
+
 Open [Releases](../../releases) and download **Pro-Financer.apk** from the newest successful Android build. A source ZIP is not an APK. The first build must finish successfully before a download exists. Build progress and logs are in [Actions](../../actions/workflows/android-apk.yml).
 
 The workflow builds a standalone release-mode APK with bundled JavaScript, supporting ARM 32-bit and ARM 64-bit phones. It uses the public Android test signing key, for personal testing only. Android 7/API 24 or later is required; Samsung J7 Nxt Android 9 still needs installation and real notification tests. Keep a private production signing key before Play Store release. Notifications require explicit device permissions.

@@ -28,7 +28,7 @@ This review checks version 1.1.1 (Android version code 3). Automated tests and s
 | Correct monthly totals | Same-month income/expense and planned-income fallback checks pass | Dashboard refresh across month changes on phone |
 | Storage, capture reset and permissions | Serialized saves and post-save acknowledgement, reset epoch and permission controls reviewed | Reopen after edits, denied/revoked access, reset, capture off and storage failure on phone |
 | Supabase Google login | Optional local mode, PKCE callbacks and secure token storage implemented | Blocked by real Supabase/Google configuration; no live sign-in tested |
-| Android APK | Previous version compiled; revised JavaScript Android export passes | Updated native compilation runs in GitHub Actions; confirm install on Samsung J7 Nxt Android 9 |
+| Android APK | Version 1.1.1 native compilation and revised JavaScript export pass | Version 1.1.1 native compilation passed in GitHub Actions; confirm install on Samsung J7 Nxt Android 9 |
 
 ## Automated checks
 
@@ -39,12 +39,12 @@ This review checks version 1.1.1 (Android version code 3). Automated tests and s
 - Native Kotlin payment parser: 33 cases plus payment/refund fingerprint regressions passed on JVM.
 - Google OAuth callback parsing checks: passed; no live sign-in or token exchange was tested.
 - Android JavaScript production export: passed.
-- GitHub workflow now runs the native parser as a JUnit unit test and all four TypeScript test files before building the APK. Full updated native build status is recorded in GitHub Actions.
+- GitHub workflow now runs the native parser as a JUnit unit test and all four TypeScript test files before building the APK. Full updated native build passed in GitHub Actions.
 
 ## Phone test sequence
 
 1. Install the latest APK from Releases. Complete onboarding; visit Dashboard, Expenses, Activity, Debts, Goals, Split and Profile. The Investment tab should be absent.
-2. Add/edit/delete an expense and income. Name an income “October salary”. Add a debt, mark it paid, create a goal and add savings. Split a bill among all members and then a subset. Verify displayed totals.
+2. Edit your profile, choose a profile photo, and verify the saved salary/savings values. Add/edit/delete an expense and income. Name an income “October salary”. Add a debt, mark it paid, create a goal and add savings. Split a bill among all members and then a subset. Verify displayed totals.
 3. Close and reopen. Verify your entries and income name survive. Android capture stores a native queue while the JavaScript app is closed; totals refresh when the app opens.
 4. Deny notification access first, then allow it and enable capture in Activity. Try both sound tests. Check capture-off and revoked-access states too.
 5. For ordinary supported received/sent notifications, check amount and direction exactly once. For refunds, unclear amounts, own-account transfers and missing references, confirm review instead of automatic totals. Failed/pending/OTP alerts should add nothing.
@@ -54,3 +54,14 @@ This review checks version 1.1.1 (Android version code 3). Automated tests and s
 9. After configuring Supabase and Google, test sign-in, cancellation, restart/session restore and sign-out. Login does not sync or separate the single local finance ledger.
 
 No physical-device, emulator UI or live Google login test was performed in this workspace. This report does not claim that every bug has been removed.
+
+## Final APK verification
+
+[GitHub Actions run 37658123296](https://github.com/7899kk/New-2/actions/runs/37658123296) completed successfully, including all four TypeScript test files, the native parser JUnit test, full standalone APK compilation and release publication.
+
+- Compiled source commit: `f71af1b191980371bdcc89938c6ae27c73c6cbe1`.
+- [Download the tested version 1.1.1 APK](https://github.com/7899kk/New-2/releases/download/android-6/Pro-Financer.apk).
+- Downloaded artifact bytes match the release SHA-256: `3f231dc1cbe06e62ad7021413e007d8fe995b3fab92474cc77095c97a6d890aa`.
+- The actual APK manifest has package `com.profinancer.app`, version `1.1.1`, version code `3`, minimum SDK `24` and target SDK `36`.
+- The actual APK contains ARM 32-bit and ARM 64-bit libraries, bundled JavaScript, the compiled notification listener, the original logo and all three original sound files. READ_SMS, RECEIVE_SMS and READ_CONTACTS are absent.
+- Physical-phone installation, UI flows, permissions, background delivery, audible playback and live Supabase Google login remain untested. Google login is disabled until configured.
