@@ -51,3 +51,7 @@ The Google sign-in screen and PKCE callback are implemented. They require your r
 Google sign-in does not sync finance data: this personal app retains one local device ledger. Changing login identities does not erase or separate that ledger. The APK is a personal test build.
 
 Received and sent payments have distinct bundled sounds. Silent mode, Do Not Disturb and Android channel settings may suppress or change sounds. The original Pro Financier logo is used in the launcher, splash and payment alerts.
+
+## Build verification
+
+The standalone Android APK compiled successfully in GitHub Actions on 7 October 2026. TypeScript, payment importer, finance-validation checks and Android native compilation passed. The pure Kotlin parser passed 24 cases locally. Actual phone notification delivery, sound playback and live Google login remain untested. Google login is disabled until Supabase is configured.
