@@ -26,6 +26,8 @@ jobs:
           result=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${BUILD_RUN_ID}/jobs" --jq '.jobs[].steps[] | select(.name == "Build standalone APK for old and new ARM phones") | .conclusion')
           test "$result" = success
           source_commit=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${BUILD_RUN_ID}" --jq .head_sha)
+          changes=$(gh api "repos/${GITHUB_REPOSITORY}/compare/${source_commit}...${GITHUB_SHA}" --jq '.files[] | select(.filename != "README.md" and (.filename | startswith(".github/workflows/") | not)) | .filename')
+          test -z "$changes"
           echo "SOURCE_COMMIT=$source_commit" >> "$GITHUB_ENV"
           echo "RELEASE_TAG=android-build-${BUILD_RUN_ID}" >> "$GITHUB_ENV"
       - uses: actions/download-artifact@v4
@@ -38,6 +40,6 @@ jobs:
         run: |
           sha256sum -c apk-download/SHA256SUMS.txt
           if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release create "$RELEASE_TAG" --target "$SOURCE_COMMIT" --title "Pro Financer Android APK" --notes "Standalone personal test APK, with automatic payment capture, distinct incoming/outgoing sounds and income naming. Enable capture and notification access in Activity. Uses Android public test signing key. Supabase Google login needs project configuration. Actual phone testing is required." --prerelease --latest=false
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --title "Pro Financer Android APK" --notes "Standalone personal test APK, with automatic payment capture, distinct incoming/outgoing sounds and income naming. Enable capture and notification access in Activity. Uses Android public test signing key. Supabase Google login needs project configuration. Actual phone testing is required." --prerelease --latest=false
           fi
           gh release upload "$RELEASE_TAG" apk-download/Pro-Financer.apk apk-download/SHA256SUMS.txt --clobber
