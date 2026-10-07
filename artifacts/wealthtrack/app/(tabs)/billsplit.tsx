@@ -1,3 +1,4 @@
+import { calculateSettlements } from "@/utils/billSettlements";
 import { validMoney, validDate, localDate } from "@/utils/financeValidation";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -80,10 +81,7 @@ export default function BillSplitScreen() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setShowExpenseModal(false);
     resetExpense();
-    // refresh selected group
-    setSelectedGroup((g) =>
-      g ? { ...g, expenses: [...g.expenses, { id: "", description: "", amount: 0, paidBy: "", splitAmong: [], date: "" }] } : null
-    );
+
   };
 
   const confirmDeleteGroup = (id: string) => {
@@ -98,40 +96,6 @@ export default function BillSplitScreen() {
         },
       },
     ]);
-  };
-
-  // Calculate settlements for a group
-  const calculateSettlements = (group: BillGroup) => {
-    const balances: Record<string, number> = {};
-    group.members.forEach((m) => (balances[m] = 0));
-
-    group.expenses.forEach((exp) => {
-      const share = exp.amount / exp.splitAmong.length;
-      balances[exp.paidBy] = (balances[exp.paidBy] || 0) + exp.amount;
-      exp.splitAmong.forEach((m) => {
-        balances[m] = (balances[m] || 0) - share;
-      });
-    });
-
-    const settlements: { from: string; to: string; amount: number }[] = [];
-    const debtors = Object.entries(balances).filter(([, v]) => v < 0).sort((a, b) => a[1] - b[1]);
-    const creditors = Object.entries(balances).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
-
-    let i = 0, j = 0;
-    while (i < debtors.length && j < creditors.length) {
-      const [debtor, debtAmt] = debtors[i];
-      const [creditor, creditAmt] = creditors[j];
-      const amt = Math.min(-debtAmt, creditAmt);
-      if (amt > 0.01) {
-        settlements.push({ from: debtor, to: creditor, amount: amt });
-      }
-      debtors[i] = [debtor, debtAmt + amt];
-      creditors[j] = [creditor, creditAmt - amt];
-      if (Math.abs(debtors[i][1]) < 0.01) i++;
-      if (Math.abs(creditors[j][1]) < 0.01) j++;
-    }
-
-    return settlements;
   };
 
   // View a specific group

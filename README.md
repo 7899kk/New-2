@@ -55,3 +55,7 @@ Received and sent payments have distinct bundled sounds. Silent mode, Do Not Dis
 ## Build verification
 
 The standalone Android APK compiled successfully in GitHub Actions on 7 October 2026. TypeScript, payment importer, finance-validation checks and Android native compilation passed. The pure Kotlin parser passed 24 cases locally. Actual phone notification delivery, sound playback and live Google login remain untested. Google login is disabled until Supabase is configured.
+
+## Specification review and regression tests
+
+See [TEST-REPORT.md](TEST-REPORT.md) for version 1.1.1 fixes, verified checks and the remaining phone test sequence. Download the newest successful APK from Releases to receive these fixes.

@@ -22,3 +22,17 @@ export function applyCapturedPayments<T extends PaymentState>(previous:T, events
           }
           return next === previous ? previous : { ...next, capturedIds:[...seen] };
 }
+
+export function resolveCapturedPayment<T extends PaymentState>(previous:T,id:string,kind:'expense'|'income'|'transfer'|'ignore',amount?:number,details?:{name?:string;category?:string;notes?:string}):T {
+  const event=previous.paymentReviews.find(item=>item.id===id);
+  if(!event) return previous;
+  const next={...previous,paymentReviews:previous.paymentReviews.filter(item=>item.id!==id)};
+  if(kind==='ignore'||kind==='transfer') return next;
+  const value=amount??event.amount;
+  if(!Number.isFinite(value)||value<=0||value>1e12||!Number.isFinite(new Date(event.timestamp).getTime())) return previous;
+  // Reuse the importer for consistent dates, UPI type and transaction references.
+  const imported=applyCapturedPayments({...next,capturedIds:next.capturedIds.filter(item=>item!==id)},[{...event,amount:value,kind}]);
+  if(kind==='income') imported.incomes=imported.incomes.map(item=>item.id===id?{...item,name:details?.name?.trim()||'Money received',category:details?.category||'Uncategorized',notes:details?.notes||'Reviewed credit notification'}:item);
+  else imported.expenses=imported.expenses.map(item=>item.id===id?{...item,notes:'Reviewed payment notification'}:item);
+  return {...imported,capturedIds:previous.capturedIds};
+}

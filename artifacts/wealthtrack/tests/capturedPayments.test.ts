@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { applyCapturedPayments } from '../utils/capturedPayments';
+import { applyCapturedPayments, resolveCapturedPayment } from '../utils/capturedPayments';
 import type { Expense, IncomeEntry, PaymentReview } from '../context/AppContext';
 import type { CapturedPayment } from '../utils/paymentModels';
 const empty:{expenses:Expense[];incomes:IncomeEntry[];paymentReviews:PaymentReview[];capturedIds:string[];profile:{name:string}}={expenses:[],incomes:[],paymentReviews:[],capturedIds:[],profile:{name:'Existing user'}};
@@ -21,3 +21,16 @@ assert.equal(applyCapturedPayments(named,[{...event,id:'credit-1',kind:'income'}
 assert.equal(JSON.parse(JSON.stringify(named)).incomes[0].category,'Salary');
 
 assert.equal(applyCapturedPayments(empty,[{...event,timestamp:1e20}]),empty);
+
+const reviewedDebit=resolveCapturedPayment(review,'ambiguous-1','expense',125.25);
+assert.equal(reviewedDebit.paymentReviews.length,1);assert.equal(reviewedDebit.expenses[0].amount,125.25);
+assert.equal(reviewedDebit.expenses[0].paymentType,'UPI');assert.equal(reviewedDebit.expenses[0].upiRef,event.reference);
+assert.deepEqual(reviewedDebit.capturedIds,review.capturedIds);
+assert.equal(resolveCapturedPayment(reviewedDebit,'ambiguous-1','expense'),reviewedDebit);
+const reviewedCredit=resolveCapturedPayment(review,'ambiguous-1','income',300,{name:' October salary ',category:'Salary',notes:'Confirmed'});
+assert.equal(reviewedCredit.incomes[0].name,'October salary');assert.equal(reviewedCredit.incomes[0].category,'Salary');assert.equal(reviewedCredit.incomes[0].amount,300);
+assert.equal(reviewedCredit.incomes[0].notes,'Confirmed');
+const ignored=resolveCapturedPayment(review,'transfer-1','ignore');assert.equal(ignored.paymentReviews.length,1);assert.equal(ignored.expenses,review.expenses);assert.equal(ignored.incomes,review.incomes);
+assert.equal(applyCapturedPayments(ignored,[{...event,id:'transfer-1',kind:'transfer'}]),ignored);
+for(const value of [0,-1,NaN,Infinity,1e13])assert.equal(resolveCapturedPayment(review,'ambiguous-1','expense',value),review);
+console.log('Review checks passed: corrected amounts, income naming, UPI/reference preservation, ignored transfers and duplicate resolution.');

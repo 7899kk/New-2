@@ -1,5 +1,6 @@
 export function validMoney(value:string,allowZero=false,optional=false):boolean {
   if(!value.trim()) return optional;
+  if(!/^(?:\d+(?:\.\d{1,2})?|\.\d{1,2})$/.test(value.trim())) return false;
   const amount=Number(value);
   return Number.isFinite(amount) && amount<=1e12 && (allowZero?amount>=0:amount>0);
 }

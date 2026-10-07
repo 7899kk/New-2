@@ -59,7 +59,7 @@ An optional EAS APK profile is included in `eas.json`. Run the EAS CLI from `art
 
 ## Remaining verification
 
-Full APK compilation was attempted but Gradle's Java downloader failed with `Network is unreachable`. This environment also has no Android SDK. Android service/module compilation and real notification delivery are therefore not verified. No APK is included.
+An earlier local APK build was blocked by the missing Android SDK/network. The standalone version 1.1.0 APK subsequently compiled successfully in GitHub Actions and was published to Releases. Version 1.1.1 regression fixes are detailed in the root TEST-REPORT.md; check GitHub Actions for the updated native build. Physical-device notification delivery and sound playback remain untested.
 
 On the actual phone, test first-open/onboarding, every existing tab, all create/edit/delete actions, state after restart, permission denial and revocation, switching capture off, supported live notifications, duplicates, foreground/background capture and reset. Compare recorded amounts with your statement. Not every legacy feature or optional online login/market-data service has been exercised; this is not a claim that all bugs are removed.
 
@@ -73,7 +73,7 @@ With Kotlin's `kotlinc` installed, compile `MoneyParser.kt` together with `tests
 
 ## October update
 
-Incoming money now has an editable name and category, defaulting to Money received / Uncategorized. Users can name it Salary, Business, Gift, Refund, Other or use a custom name. Native alerts are sent once only after successful native queue storage, with separate alert controls, a test button and permission settings. Tapping an alert opens Activity. Lock-screen public content omits amounts. The GitHub workflow builds a standalone release-mode APK with bundled JavaScript and uploads it to Releases after successful compilation. Full native compilation and device notification tests remain required.
+Incoming money now has an editable name and category, defaulting to Money received / Uncategorized. Users can name it Salary, Business, Gift, Refund, Other or use a custom name. Native alerts are sent once only after successful native queue storage, with separate alert controls, a test button and permission settings. Tapping an alert opens Activity. Lock-screen public content omits amounts. The GitHub workflow builds a standalone release-mode APK with bundled JavaScript and uploads it to Releases after successful compilation. The initial native APK subsequently compiled in GitHub Actions; device notification tests remain required.
 
 ## Sounds, logo and sign-in
 

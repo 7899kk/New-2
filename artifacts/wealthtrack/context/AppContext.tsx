@@ -1,5 +1,5 @@
 import { monthlyTotals } from "@/utils/financeValidation";
-import { applyCapturedPayments } from "@/utils/capturedPayments";
+import { applyCapturedPayments, resolveCapturedPayment } from "@/utils/capturedPayments";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, {
   createContext,
@@ -294,19 +294,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [update]);
   const updateIncome = useCallback((id:string,data:Partial<IncomeEntry>) => update(s => ({...s,incomes:s.incomes.map(e=>e.id===id ? {...e,...data,id:e.id} : e)})),[update]);
   const deleteIncome = useCallback((id:string) => update(s=>({...s,incomes:s.incomes.filter(e=>e.id!==id)})),[update]);
-  const resolvePayment = useCallback((id:string,kind:"expense"|"income"|"transfer"|"ignore",amount?:number,details?:{name?:string;category?:string;notes?:string}) => update(s => {
-    const e=s.paymentReviews.find(e=>e.id===id);
-    if(!e) return s;
-    const value=amount ?? e.amount;
-    if(!Number.isFinite(value) || value<=0) return s;
-    const d=new Date(e.timestamp);
-    const date=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-    const source=sourceNames[e.source] || e.source;
-    const next={...s,paymentReviews:s.paymentReviews.filter(e=>e.id!==id)};
-    if(kind==="expense") return {...next,expenses:[{id:e.id,captureId:e.id,source,date,amount:value,category:"Others" as const,paymentType:"Bank" as const,notes:"Reviewed payment notification"},...s.expenses]};
-    if(kind==="income") return {...next,incomes:[{id:e.id,captureId:e.id,source,date,amount:value,notes:details?.notes || "Reviewed credit notification",name:details?.name?.trim() || "Money received",category:details?.category || "Uncategorized"},...s.incomes]};
-    return next;
-  }),[update]);
+  const resolvePayment = useCallback((id:string,kind:"expense"|"income"|"transfer"|"ignore",amount?:number,details?:{name?:string;category?:string;notes?:string}) => update(s => resolveCapturedPayment(s,id,kind,amount,details)),[update]);
 
   const updateProfile = useCallback(
     (profile: Partial<UserProfile>) =>

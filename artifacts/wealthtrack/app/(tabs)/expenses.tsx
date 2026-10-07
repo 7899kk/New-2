@@ -51,7 +51,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 type ViewMode = "All" | "Month" | "Year";
 
 function today() {
-  return new Date().toISOString().slice(0, 10);
+  return localDate();
 }
 
 function nowTime() {

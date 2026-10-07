@@ -1,6 +1,15 @@
 import expo.modules.moneynotifications.MoneyParser
 fun main() {
   val cases=listOf(
+    Triple("₹ 250.50 debited. UPI Ref: 123456789012", "expense", 250.50),
+    Triple("INR 1,00,000 received. UTR: ABCD123456", "income", 100000.0),
+    Triple("Rs. 1,,200 debited. UTR: ABCD123456", "skip", 0.0),
+    Triple("INR 12,34 debited. UTR: ABCD123456", "skip", 0.0),
+    Triple("INR 100 payment not successful. UTR: ABCD123456", "skip", 0.0),
+    Triple("INR 100 not received. UTR: ABCD123456", "skip", 0.0),
+    Triple("INR 100 paid. Reference number: ABCD123456", "expense", 100.0),
+    Triple("INR 100 paid. Ref: merchant", "review", 100.0),
+    Triple("INR 100 paid. Reference: 1234567890123456789012345678901234567890123", "review", 100.0),
     Triple("INR 250.50 debited. UPI Ref: 123456789012", "expense", 250.50),
     Triple("Rs. 1,200 received. UTR: ABCD123456", "income", 1200.0),
     Triple("You paid ₹100. Transaction ID: ABC123456", "expense", 100.0),
@@ -31,5 +40,5 @@ fun main() {
     if(event!=null) check(event.amount==amount) { "Wrong amount: $event" }
   }
   check(MoneyParser.parse("INR 10 paid. UTR: abc123456")?.reference=="ABC123456")
-  println("24 native parser cases passed")
+  println("${cases.size + 1} native parser cases passed")
 }
