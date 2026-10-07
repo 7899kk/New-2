@@ -10,6 +10,7 @@ This review checks version 1.1.1 (Android version code 3). Automated tests and s
 - Reference parsing could accept a word such as “number” as a transaction identifier. It now recognizes number/no/ID labels, requires a digit and rejects overlong identifiers.
 - A refund using the original transaction reference and amount was discarded as a duplicate payment. Refunds now have separate deduplication IDs; ordinary payment IDs stay compatible with the previous APK.
 - Bill settlements omitted a one-paisa debt and used fractional-paisa math. Splits now distribute integer paisa, including deterministic remainder distribution, and settle every nonzero balance.
+- Google callbacks containing cancellation/errors in a URL fragment, or no login code, could leave the callback screen waiting forever. These now report an actionable error; callback tests cover query/fragment errors and PKCE flow IDs.
 - Confirming an ambiguous UPI payment changed it to Bank and discarded its reference. Review resolution now shares the import logic and preserves source, reference, payment type and date.
 
 ## Feature status
@@ -36,8 +37,9 @@ This review checks version 1.1.1 (Android version code 3). Automated tests and s
 - Money/date/monthly-total regression checks, including Asia/Kolkata midnight: passed.
 - Bill settlement regression checks: passed.
 - Native Kotlin payment parser: 33 cases plus payment/refund fingerprint regressions passed on JVM.
+- Google OAuth callback parsing checks: passed; no live sign-in or token exchange was tested.
 - Android JavaScript production export: passed.
-- GitHub workflow now runs the native parser as a JUnit unit test and all three TypeScript test files before building the APK. Full updated native build status is recorded in GitHub Actions.
+- GitHub workflow now runs the native parser as a JUnit unit test and all four TypeScript test files before building the APK. Full updated native build status is recorded in GitHub Actions.
 
 ## Phone test sequence
 

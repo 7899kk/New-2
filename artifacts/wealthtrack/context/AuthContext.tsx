@@ -4,19 +4,16 @@ import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/utils/supabase';
+import { parseOAuthCallback } from '@/utils/oauthCallback';
 
 WebBrowser.maybeCompleteAuthSession();
 const redirectUri=()=>Linking.createURL('auth-callback',{scheme:'profinancer'});
 const exchanges=new Map<string,Promise<void>>();
 async function finishOAuth(url:string) {
   if(!supabase) throw new Error('Google sign-in has not been configured yet.');
-  const parsed=new URL(url);
-  const error=parsed.searchParams.get('error_description') || parsed.searchParams.get('error');
-  if(error) throw new Error(error);
-  const code=parsed.searchParams.get('code');
-  if(!code) return;
+  const {code,flowId}=parseOAuthCallback(url);
   const existing=exchanges.get(code);if(existing) return existing;
-  const task=(async()=>{const {error}=await supabase.auth.exchangeCodeForSession(code,parsed.searchParams.get('sb_flow_id')?{flowId:parsed.searchParams.get('sb_flow_id')!}:undefined);if(error) throw error;})();
+  const task=(async()=>{const {error}=await supabase.auth.exchangeCodeForSession(code,flowId?{flowId}:undefined);if(error) throw error;})();
   exchanges.set(code,task);
   if(exchanges.size>8) exchanges.delete(exchanges.keys().next().value!);
   return task;
