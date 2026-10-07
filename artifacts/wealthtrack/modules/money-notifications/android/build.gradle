@@ -1,0 +1,8 @@
+apply plugin: 'com.android.library'
+apply plugin: 'expo-module-gradle-plugin'
+group = 'expo.modules.moneynotifications'
+version = '1.0.0'
+android {
+  namespace 'expo.modules.moneynotifications'
+  defaultConfig { versionCode 1; versionName '1.0.0'; minSdkVersion 24 }
+}
